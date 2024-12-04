@@ -8,6 +8,8 @@ function App() {
   const [isDeleted, setIsDeleted] = useState(false);
   const [isCreated, setIsCreated] = useState(false);
   const [createFormOpen, setCreateFormOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedObject, setSelectedObject] = useState(null);
 
   // delete function
   const deleteStudent = (studentId) => {
@@ -27,31 +29,62 @@ function App() {
   const openFormModal = () => setCreateFormOpen(true);
 
   // close modal
-  const closeFormModal  = () => setCreateFormOpen(false);
-
-
-  // create student
-  const createStudent = (studentObj) => {
-      axios.post("https://674e8c3e635bad45618f0309.mockapi.io/studens", studentObj).then( (response) => {
-          console.log(response.data)
-          setIsCreated(true);
-      });
-
-      closeFormModal();
+  const closeFormModal = () => {
+    setIsEditing(false);
+    setSelectedObject(null);
+    setCreateFormOpen(false);
   }
 
 
 
+
+  // create student
+  const createStudent = (studentObj) => {
+    axios.post("https://674e8c3e635bad45618f0309.mockapi.io/studens", studentObj).then((response) => {
+      console.log(response.data)
+      setIsCreated(true);
+    });
+
+    closeFormModal();
+  }
+
+
+  // set editing function
+  const editStudent = (studentId) => {
+
+    // switch ON editing mode
+    setIsEditing(true);
+    axios.get(`https://674e8c3e635bad45618f0309.mockapi.io/studens/${studentId}`).then((response) => {
+
+      console.log(response.data);
+      setSelectedObject(response.data);
+      openFormModal();
+
+    })
+
+  }
+
+  // udpate student 
+  const udpateStudent = (studentObj) => {
+    axios.put(`https://674e8c3e635bad45618f0309.mockapi.io/studens/${studentObj.id}`, studentObj).then((response) => {
+      console.log(response.data)
+      setIsCreated(true);
+    });
+
+    closeFormModal();
+  }
+
+
   useEffect(() => {
 
-    axios.get("https://674e8c3e635bad45618f0309.mockapi.io/studens").then( (response) => {
+    axios.get("https://674e8c3e635bad45618f0309.mockapi.io/studens").then((response) => {
 
       console.log(response.data);
       setStudents(response.data);
       setIsDeleted(false);
       setIsCreated(false);
 
-    } )
+    })
 
 
   }, [isDeleted, isCreated]);
@@ -63,7 +96,7 @@ function App() {
       <div className="container">
         <h1 className="text-center mb-3">Tasks Application <button className="btn btn-success btn-sm" onClick={openFormModal}>Create</button> </h1>
         <div className="task-list">
-          <CreateForm createFormOpen={createFormOpen} closeFormModal={closeFormModal} createStudent={createStudent} />
+          <CreateForm udpateStudent={udpateStudent} isEditing={isEditing} selectedObject={selectedObject} createFormOpen={createFormOpen} closeFormModal={closeFormModal} createStudent={createStudent} />
           <table className="table">
             <thead>
               <tr>
@@ -77,8 +110,8 @@ function App() {
             </thead>
             <tbody>
               {
-                students.map( (std) => {
-                  return(
+                students.map((std) => {
+                  return (
                     <tr key={std.id}>
                       <td>{std.id}</td>
                       <td>{std.name}</td>
@@ -86,16 +119,16 @@ function App() {
                       <td>{std.age}</td>
                       <td>
                         {
-                          (std.isActive == true || std.isActive == 'true') ? "Present": "Absent" 
+                          (std.isActive == true || std.isActive == 'true') ? "Present" : "Absent"
                         }
                       </td>
                       <td>
-                        <button className="btn btn-danger btn-sm me-2" onClick={ () => {deleteStudent(std.id)}  }>Delete</button>
-                        <button className="btn btn-warning btn-sm me-2">Edit</button>
+                        <button className="btn btn-danger btn-sm me-2" onClick={() => { deleteStudent(std.id) }}>Delete</button>
+                        <button className="btn btn-warning btn-sm me-2" onClick={() => { editStudent(std.id) }}>Edit</button>
                       </td>
                     </tr>
                   )
-                } )
+                })
               }
             </tbody>
           </table>
