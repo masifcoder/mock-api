@@ -54,9 +54,10 @@ function App() {
 
     // switch ON editing mode
     setIsEditing(true);
+    
     axios.get(`https://674e8c3e635bad45618f0309.mockapi.io/studens/${studentId}`).then((response) => {
 
-      console.log(response.data);
+      console.log(typeof response.data);
       setSelectedObject(response.data);
       openFormModal();
 
@@ -89,7 +90,7 @@ function App() {
 
   }, [isDeleted, isCreated]);
 
-
+console.log(selectedObject && selectedObject.name)
 
   return (
     <>
