@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import axios from "axios";
 import CreateForm from "./components/CreateForm";
+import EditForm from "./components/EditForm";
 
 function App() {
   const [students, setStudents] = useState([]);
@@ -11,8 +12,11 @@ function App() {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedObject, setSelectedObject] = useState(null);
 
+  const [editFormOpen, setEditFormOpen] = useState(false);
+
   // delete function
   const deleteStudent = (studentId) => {
+    
     axios.delete(`https://674e8c3e635bad45618f0309.mockapi.io/studens/${studentId}`)
       .then((response) => {
         console.log(response.data);
@@ -29,13 +33,11 @@ function App() {
   const openFormModal = () => setCreateFormOpen(true);
 
   // close modal
-  const closeFormModal = () => {
+  const closeCreateFormModal = () => {
     setIsEditing(false);
     setSelectedObject(null);
     setCreateFormOpen(false);
   }
-
-
 
 
   // create student
@@ -45,34 +47,34 @@ function App() {
       setIsCreated(true);
     });
 
-    closeFormModal();
+    closeCreateFormModal();
   }
 
+
+  
+  // open edit modal 
+  const openEditFormModal = () => setEditFormOpen(true);
+  const closeEditFormModal = () => setEditFormOpen(false);
 
   // set editing function
   const editStudent = (studentId) => {
 
     // switch ON editing mode
     setIsEditing(true);
-    
     axios.get(`https://674e8c3e635bad45618f0309.mockapi.io/studens/${studentId}`).then((response) => {
-
-      console.log(typeof response.data);
       setSelectedObject(response.data);
-      openFormModal();
-
+      openEditFormModal();
     })
-
   }
 
   // udpate student 
   const udpateStudent = (studentObj) => {
+    console.log(studentObj)
     axios.put(`https://674e8c3e635bad45618f0309.mockapi.io/studens/${studentObj.id}`, studentObj).then((response) => {
       console.log(response.data)
       setIsCreated(true);
+      closeEditFormModal();
     });
-
-    closeFormModal();
   }
 
 
@@ -97,7 +99,8 @@ console.log(selectedObject && selectedObject.name)
       <div className="container">
         <h1 className="text-center mb-3">Tasks Application <button className="btn btn-success btn-sm" onClick={openFormModal}>Create</button> </h1>
         <div className="task-list">
-          <CreateForm udpateStudent={udpateStudent} isEditing={isEditing} selectedObject={selectedObject} createFormOpen={createFormOpen} closeFormModal={closeFormModal} createStudent={createStudent} />
+          <CreateForm   createFormOpen={createFormOpen} closeCreateFormModal={closeCreateFormModal} createStudent={createStudent} />
+          <EditForm editFormOpen={editFormOpen} udpateStudent={udpateStudent} isEditing={isEditing} selectedObject={selectedObject} closeEditFormModal={closeEditFormModal} />
           <table className="table">
             <thead>
               <tr>

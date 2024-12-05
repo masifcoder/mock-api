@@ -1,9 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-function CreateForm({ createFormOpen, closeCreateFormModal, createStudent }) {
-    const [studentObj, setStudentObj] = useState({name: '', age: '', city: '', isActive: '-'});
+function EditForm({ isEditing, selectedObject, udpateStudent, editFormOpen, closeEditFormModal }) {
+    const [studentObj, setStudentObj] = useState({ id: '', name: '', city: '', age: '', isActive: '-' });
 
-    if (!createFormOpen) {
+
+    useEffect(() => {
+        if (selectedObject !== null) {
+            console.log(selectedObject)
+            setStudentObj({ name: selectedObject.name, city: selectedObject.city, age: selectedObject.age, isActive: selectedObject.isActive, id: selectedObject.id});
+        }
+
+    }, [selectedObject]);
+
+
+
+    if (!editFormOpen) {
         return null;
     }
 
@@ -12,18 +23,14 @@ function CreateForm({ createFormOpen, closeCreateFormModal, createStudent }) {
         setStudentObj(newExp);
     };
 
-    const handleSubmit = () => {
-        createStudent(studentObj);
-    };
-
     return (
-        <div className="mdl-overlay" onClick={closeCreateFormModal}>
+        <div className="mdl-overlay" onClick={closeEditFormModal}>
             <div className="mdl-container" onClick={(e) => e.stopPropagation()}>
                 <div className="mdl-header">
-                    <button onClick={closeCreateFormModal} className="close-button">X</button>
+                    <button onClick={closeEditFormModal} className="close-button">X</button>
                 </div>
                 <div className="mdl-body">
-                    <h5>Create Student</h5>
+                    <h5>Update Student Record</h5>
                     <div className="form-group">
                         <form onSubmit={(e) => e.preventDefault()}>
                             <input
@@ -61,11 +68,10 @@ function CreateForm({ createFormOpen, closeCreateFormModal, createStudent }) {
                                 <option value="false">Absent</option>
                             </select>
                             <button
-                                type="button"
-                                className="btn btn-sm w-100 btn-success py-2"
-                                onClick={() => handleSubmit()}
+                                className={`btn btn-sm w-100 btn-success py-2`}
+                                onClick={() => udpateStudent(studentObj)}
                             >
-                                Create New Student
+                                Update Student
                             </button>
                         </form>
                     </div>
@@ -75,4 +81,4 @@ function CreateForm({ createFormOpen, closeCreateFormModal, createStudent }) {
     );
 }
 
-export default CreateForm;
+export default EditForm;
