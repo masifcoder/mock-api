@@ -3,6 +3,8 @@ import "./App.css";
 import axios from "axios";
 import CreateForm from "./components/CreateForm";
 import EditForm from "./components/EditForm";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [students, setStudents] = useState([]);
@@ -14,9 +16,10 @@ function App() {
 
   const [editFormOpen, setEditFormOpen] = useState(false);
 
+
   // delete function
   const deleteStudent = (studentId) => {
-    
+    const id = toast.loading("Please wait deleting...")
     axios.delete(`https://674e8c3e635bad45618f0309.mockapi.io/studens/${studentId}`)
       .then((response) => {
         console.log(response.data);
@@ -25,7 +28,10 @@ function App() {
       .catch((er) => {
         console.log(er.messsage);
       })
-      .finally(() => { });
+      .finally(() => {
+        //do something else
+        toast.update(id, { render: "Successfully deleted", type: "success", isLoading: false, autoClose: 500 });
+      });
   };
 
 
@@ -51,7 +57,7 @@ function App() {
   }
 
 
-  
+
   // open edit modal 
   const openEditFormModal = () => setEditFormOpen(true);
   const closeEditFormModal = () => setEditFormOpen(false);
@@ -92,14 +98,14 @@ function App() {
 
   }, [isDeleted, isCreated]);
 
-console.log(selectedObject && selectedObject.name)
+  console.log(selectedObject && selectedObject.name)
 
   return (
     <>
       <div className="container">
         <h1 className="text-center mb-3">Tasks Application <button className="btn btn-success btn-sm" onClick={openFormModal}>Create</button> </h1>
         <div className="task-list">
-          <CreateForm   createFormOpen={createFormOpen} closeCreateFormModal={closeCreateFormModal} createStudent={createStudent} />
+          <CreateForm createFormOpen={createFormOpen} closeCreateFormModal={closeCreateFormModal} createStudent={createStudent} />
           <EditForm editFormOpen={editFormOpen} udpateStudent={udpateStudent} isEditing={isEditing} selectedObject={selectedObject} closeEditFormModal={closeEditFormModal} />
           <table className="table">
             <thead>
@@ -138,6 +144,7 @@ console.log(selectedObject && selectedObject.name)
           </table>
         </div>
       </div>
+      <ToastContainer autoClose={1000} />
     </>
   );
 }
